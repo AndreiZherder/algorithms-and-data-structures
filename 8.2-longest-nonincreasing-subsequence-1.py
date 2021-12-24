@@ -28,51 +28,44 @@ def reversed_bisect_right(a: List[int], num: int) -> int:
     return left
 
 
-def reversed_bisect_left(a: List[int], num: int) -> int:
-    left = 0
-    right = len(a) - 1
-    while left <= right:
-        middle = left + (right - left) // 2
-        if num < a[middle]:
-            left = middle + 1
-        else:
-            right = middle - 1
-    return left
-
-
 def longest_nonincreasing_subsequence(a: List[int]) -> (int, List[int]):
     n = len(a)
-    if n == 0:
-        return 0, []
+    if n <= 1:
+        return n, list(a)
     inf = 10 ** 9 + 1
 
     # dp[i] -  the element at which a subsequence of length i terminates.
     # If there are multiple such sequences, then we take the one that ends in the biggest element.
+    # dpi[i] - the index of element at which a subsequence of length i terminates.
     dp = [-inf for _ in range(n + 2)]
     dp[0] = inf
+    dpi = [-1 for _ in range(n + 2)]
     # a:    5   3   4   4   2
     # i:    0   1   2   3   4
     # dp:   inf 5   4   4   2   -inf    -inf
 
-    # ancestors
-    p = [-1 for _ in range(n)]
-    # p[i] is the index of the previous element for the optimal subsequence ending in element i.
-
+    # prev[i] is the index of the previous element for the optimal subsequence ending in element i.
+    previ = [-1 for _ in range(n + 2)]
+    length = 1
     for i in range(n):
         pos = reversed_bisect_right(dp, a[i])
         dp[pos] = a[i]
-        print(dp)
-    length = reversed_bisect_left(dp, -inf) - 1
+        dpi[pos] = i
+        previ[i] = dpi[pos - 1]
+        if pos > length:
+            length = pos
     seq = []
-    return length, seq
+    i = dpi[length]
+    for pos in range(length - 1, -1, -1):
+        seq.append(i + 1)
+        i = previ[i]
+    return length, list(reversed(seq))
 
 
 def main():
-    # n = int(input())
-    # a = [int(num) for num in input().split()]
-    a = [7, 6, 1, 6, 4, 1, 2, 4, 10, 1]
-
-    length, *seq = longest_nonincreasing_subsequence(a)
+    n = int(input())
+    a = [int(num) for num in input().split()]
+    length, seq = longest_nonincreasing_subsequence(a)
     print(length)
     print(*seq)
 
