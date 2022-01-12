@@ -94,10 +94,17 @@ from collections import namedtuple
 from typing import List
 
 
+class Node:
+    def __init__(self, parent: int, rank: int, val: int):
+        self.parent = parent
+        self.rank = rank
+        self.val = val
+
+
 class DSU:
     def __init__(self, vals: List[int]):
-        Node = namedtuple('Node', ['parent', 'rank', 'val'])
         self.nodes = [Node(i, 0, vals[i]) for i in range(len(vals))]
+        self.maximum = max(node.val for node in self.nodes)
 
     def find(self, i: int) -> int:
         while i != self.nodes[i].parent:
@@ -111,8 +118,14 @@ class DSU:
             return
         if self.nodes[i_id].rank > self.nodes[j_id].rank:
             self.nodes[j_id].parent = i_id
+            self.nodes[i_id].val += self.nodes[j_id].val
+            self.nodes[j_id].val = 0
+            self.maximum = max(self.maximum, self.nodes[i_id].val)
         else:
             self.nodes[i_id].parent = j_id
+            self.nodes[j_id].val += self.nodes[i_id].val
+            self.nodes[i_id].val = 0
+            self.maximum = max(self.maximum, self.nodes[j_id].val)
             if self.nodes[i_id].rank == self.nodes[j_id].rank:
                 self.nodes[j_id].rank += 1
 
@@ -121,9 +134,10 @@ def main():
     n, m = (int(num) for num in input().split())
     dsu = DSU([int(num) for num in input().split()])
     Request = namedtuple('Request', ['dest', 'source'])
-    requests = (Request._make(map(int, input().split())) for _ in range(m))
+    requests = (Request._make(map(lambda num: int(num) - 1, input().split())) for _ in range(m))
     for request in requests:
         dsu.union(request.dest, request.source)
+        print(dsu.maximum)
 
 
 if __name__ == '__main__':
