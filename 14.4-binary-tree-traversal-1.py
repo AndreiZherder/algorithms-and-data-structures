@@ -73,36 +73,33 @@ class Tree:
         self.nodes = nodes
 
     def preorder(self, i: int):
-        print(self.nodes[i].key, end=' ')
+        yield self.nodes[i].key
         if self.nodes[i].left != -1:
-            self.preorder(self.nodes[i].left)
+            yield from self.preorder(self.nodes[i].left)
         if self.nodes[i].right != -1:
-            self.preorder(self.nodes[i].right)
+            yield from self.preorder(self.nodes[i].right)
 
     def inorder(self, i: int):
         if self.nodes[i].left != -1:
-            self.inorder(self.nodes[i].left)
-        print(self.nodes[i].key, end=' ')
+            yield from self.inorder(self.nodes[i].left)
+        yield self.nodes[i].key
         if self.nodes[i].right != -1:
-            self.inorder(self.nodes[i].right)
+            yield from self.inorder(self.nodes[i].right)
 
     def postorder(self, i: int):
         if self.nodes[i].left != -1:
-            self.postorder(self.nodes[i].left)
+            yield from self.postorder(self.nodes[i].left)
         if self.nodes[i].right != -1:
-            self.postorder(self.nodes[i].right)
-        print(self.nodes[i].key, end=' ')
+            yield from self.postorder(self.nodes[i].right)
+        yield self.nodes[i].key
 
 
 def main():
     n = int(input())
-    tree = Tree([Node._make(map(int, input().split())) for _ in range(n)])
-    tree.inorder(0)
-    print()
-    tree.preorder(0)
-    print()
-    tree.postorder(0)
-    print()
+    tree = Tree([Node(*map(int, input().split())) for _ in range(n)])
+    print(*tree.inorder(0))
+    print(*tree.preorder(0))
+    print(*tree.postorder(0))
 
 
 if __name__ == '__main__':
