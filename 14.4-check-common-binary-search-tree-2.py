@@ -91,7 +91,7 @@ class Tree:
     def __init__(self, nodes: List[Node]):
         self.nodes = nodes
 
-    def inorder(self, i: int) -> (List[Node], int):
+    def inorder(self, i: int) -> (Node, int):
         height = 0
         stack = [i]
         i = self.nodes[i].left
