@@ -7,8 +7,8 @@ class Node:
     def __init__(self, key: int = None, parent: 'Node' = None):
         self.parent = parent
         self.key = key
-        self.left = None
-        self.right = None
+        self.left: Optional['Node'] = None
+        self.right: Optional['Node'] = None
         self.height = 0
 
     def __str__(self):
@@ -117,6 +117,9 @@ class Tree:
         node = self.root.find(key) if self.root else None
         if not node:
             return
+        self.__delete_node(node)
+
+    def __delete_node(self, node: Node):
         # no children
         if not node.left and not node.right:
             if node == self.root:
@@ -127,14 +130,12 @@ class Tree:
             else:
                 node.parent.right = None
             node.parent.update_heights()
-            return
         # one child
-        if node.left or node.right:
+        elif (node.left and not node.right) or (node.right and not node.left):
             child = node.left if node.left else node.right
             if node == self.root:
                 self.root = child
                 child.parent = None
-                return
             else:
                 if node.parent.left == node:
                     node.parent.left = child
@@ -142,7 +143,13 @@ class Tree:
                     node.parent.right = child
                 child.parent = node.parent
                 node.parent.update_heights()
-                return
+        # two children
+        else:
+            node2 = node.left
+            while node2.right:
+                node2 = node2.right
+            node.key, node2.key = node2.key, node.key
+            self.__delete_node(node2)
 
     def min(self) -> Optional[int]:
         if not self.root:
@@ -163,19 +170,11 @@ class Tree:
 
 def main():
     tree = Tree()
-    for key in [5, 7, 6, 4, 2, 3, 8, 1]:
+    for key in [6, 8, 4, 5, 2, 3, 7, 1, 9]:
         tree.insert(key)
     print(tree)
     print(f'max = {tree.max()}, min = {tree.min()}')
-    tree.delete(4)
-    print(tree)
-    tree.delete(8)
-    print(tree)
-    tree.delete(6)
-    print(tree)
-    tree.delete(7)
-    print(tree)
-    tree.delete(5)
+    tree.delete(2)
     print(tree)
 
 
