@@ -81,21 +81,70 @@ class Node:
         else:
             return None
 
-    def insert(self, key):
+    def insert(self, key) -> 'Node':
         if self.key == key:
-            return
+            return self
         elif key < self.key:
             if self.left:
                 self.left.insert(key)
+                return self.balance(self)
             else:
                 self.left = Node(key, self)
                 self.update_heights()
+                return self
         elif self.right:
             self.right.insert(key)
+            return self.balance(self)
         else:
             self.right = Node(key, self)
             self.update_heights()
+            return self
 
+    def balance_factor(self, node: 'Node') -> int:
+        return (node.right.height if node.right else 0) - (node.left.height if node.left else 0)
+
+    def balance(self, node: 'Node') -> 'Node':
+        if self.balance_factor(node) == 2:
+            if self.balance_factor(node.right) < 0:
+                self.rotateright(node.right)
+            return self.rotateleft(node)
+        if self.balance_factor(node) == -2:
+            if self.balance_factor(node.left) > 0:
+                self.rotateleft(node.left)
+            return self.rotateright(node)
+        return node
+
+    def rotateright(self, p: 'Node') -> 'Node':
+        q = p.left
+        p.left = q.right
+        if q.right:
+            q.right.parent = p
+        q.right = p
+        q.parent = p.parent
+        p.parent = q
+        if q.parent:
+            if q.parent.left == p:
+                q.parent.left = q
+            else:
+                q.parent.right = q
+        p.update_heights()
+        return q
+
+    def rotateleft(self, q: 'Node')  -> 'Node':
+        p = q.right
+        q.right = p.left
+        if p.left:
+            p.left.parent = q
+        p.left = q
+        p.parent = q.parent
+        q.parent = p
+        if p.parent:
+            if p.parent.left == q:
+                p.parent.left = p
+            else:
+                p.parent.right = p
+        q.update_heights()
+        return p
 
 class Tree:
     def __init__(self):
@@ -109,7 +158,7 @@ class Tree:
 
     def insert(self, key):
         if self.root:
-            self.root.insert(key)
+            self.root = self.root.insert(key)
         else:
             self.root = Node(key)
 
@@ -170,11 +219,8 @@ class Tree:
 
 def main():
     tree = Tree()
-    for key in [6, 8, 4, 5, 2, 3, 7, 1, 9]:
+    for key in range(11):
         tree.insert(key)
-    print(tree)
-    print(f'max = {tree.max()}, min = {tree.min()}')
-    tree.delete(2)
     print(tree)
 
 
