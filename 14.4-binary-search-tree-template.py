@@ -100,6 +100,55 @@ class Node:
             self.update_heights()
             return self
 
+    def delete_node(self, node: 'Node') -> Optional['Node']:
+        # no children
+        if not node.left and not node.right:
+            if not node.parent:
+                return None
+            if node.parent.left == node:
+                node.parent.left = None
+            else:
+                node.parent.right = None
+            node.parent.update_heights()
+
+            node = node.parent
+            ret = node
+            while node:
+                node = self.balance(node)
+                ret = node
+                node = node.parent
+            return ret
+
+        # one child
+        elif (node.left and not node.right) or (node.right and not node.left):
+            child = node.left if node.left else node.right
+            if not node.parent:
+                child.parent = None
+                return child
+            else:
+                if node.parent.left == node:
+                    node.parent.left = child
+                else:
+                    node.parent.right = child
+                child.parent = node.parent
+                node.parent.update_heights()
+
+                node = node.parent
+                ret = node
+                while node:
+                    node = self.balance(node)
+                    ret = node
+                    node = node.parent
+                return ret
+
+        # two children
+        else:
+            node2 = node.left
+            while node2.right:
+                node2 = node2.right
+            node.key, node2.key = node2.key, node.key
+            return self.delete_node(node2)
+
     def balance_factor(self, node: 'Node') -> int:
         return (node.right.height if node.right else 0) - (node.left.height if node.left else 0)
 
@@ -130,7 +179,7 @@ class Node:
         p.update_heights()
         return q
 
-    def rotateleft(self, q: 'Node')  -> 'Node':
+    def rotateleft(self, q: 'Node') -> 'Node':
         p = q.right
         q.right = p.left
         if p.left:
@@ -145,6 +194,7 @@ class Node:
                 p.parent.right = p
         q.update_heights()
         return p
+
 
 class Tree:
     def __init__(self):
@@ -166,39 +216,7 @@ class Tree:
         node = self.root.find(key) if self.root else None
         if not node:
             return
-        self.__delete_node(node)
-
-    def __delete_node(self, node: Node):
-        # no children
-        if not node.left and not node.right:
-            if node == self.root:
-                self.root = None
-                return
-            if node.parent.left == node:
-                node.parent.left = None
-            else:
-                node.parent.right = None
-            node.parent.update_heights()
-        # one child
-        elif (node.left and not node.right) or (node.right and not node.left):
-            child = node.left if node.left else node.right
-            if node == self.root:
-                self.root = child
-                child.parent = None
-            else:
-                if node.parent.left == node:
-                    node.parent.left = child
-                else:
-                    node.parent.right = child
-                child.parent = node.parent
-                node.parent.update_heights()
-        # two children
-        else:
-            node2 = node.left
-            while node2.right:
-                node2 = node2.right
-            node.key, node2.key = node2.key, node.key
-            self.__delete_node(node2)
+        self.root = self.root.delete_node(node)
 
     def min(self) -> Optional[int]:
         if not self.root:
@@ -221,6 +239,11 @@ def main():
     tree = Tree()
     for key in range(11):
         tree.insert(key)
+    print(tree)
+    tree.delete(4)
+    tree.delete(3)
+    tree.delete(2)
+    tree.delete(1)
     print(tree)
 
 
