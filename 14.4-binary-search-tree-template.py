@@ -60,14 +60,6 @@ class Node:
         lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
         return lines, n + m + u, max(p, q) + 2, n + u // 2
 
-    def update_heights(self):
-        node = self
-        while node:
-            left_height = node.left.height if node.left else 0
-            right_height = node.right.height if node.right else 0
-            node.height = (1 + max(left_height, right_height)) if (node.left or node.right) else 0
-            node = node.parent
-
     def find(self, key: int) -> Optional['Node']:
         if self.key == key:
             return self
@@ -100,7 +92,7 @@ class Node:
             self.update_heights()
             return self
 
-    def delete_node(self, node: 'Node') -> Optional['Node']:
+    def delete(self, node: 'Node') -> Optional['Node']:
         # no children
         if not node.left and not node.right:
             if not node.parent:
@@ -147,7 +139,15 @@ class Node:
             while node2.right:
                 node2 = node2.right
             node.key, node2.key = node2.key, node.key
-            return self.delete_node(node2)
+            return self.delete(node2)
+
+    def update_heights(self):
+        node = self
+        while node:
+            left_height = node.left.height if node.left else 0
+            right_height = node.right.height if node.right else 0
+            node.height = (1 + max(left_height, right_height)) if (node.left or node.right) else 0
+            node = node.parent
 
     def balance_factor(self, node: 'Node') -> int:
         return (node.right.height if node.right else 0) - (node.left.height if node.left else 0)
@@ -216,7 +216,7 @@ class Tree:
         node = self.root.find(key) if self.root else None
         if not node:
             return
-        self.root = self.root.delete_node(node)
+        self.root = self.root.delete(node)
 
     def min(self) -> Optional[int]:
         if not self.root:
@@ -237,13 +237,14 @@ class Tree:
 
 def main():
     tree = Tree()
-    for key in range(11):
+    for key in range(32):
         tree.insert(key)
     print(tree)
     tree.delete(4)
     tree.delete(3)
     tree.delete(2)
     tree.delete(1)
+    tree.delete(9)
     print(tree)
 
 
