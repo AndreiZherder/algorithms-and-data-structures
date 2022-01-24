@@ -231,6 +231,58 @@ class Node:
             node.key, node2.key = node2.key, node.key
             return self.delete(node2)
 
+    def next_node(self) -> Optional['Node']:
+        if self.right:
+            node = self.right
+            while node.left:
+                node = node.left
+            return node
+        else:
+            node = self
+            while node.parent and node.parent.right == node:
+                node = node.parent
+            return node.parent
+
+    def prev_node(self) -> Optional['Node']:
+        if self.left:
+            node = self.left
+            while node.right:
+                node = node.right
+            return node
+        else:
+            node = self
+            while node.parent and node.parent.left == node:
+                node = node.parent
+            return node.parent
+
+    def upperbond(self, key: int) -> Optional['Node']:
+        if key == self.key:
+            return self
+        if key < self.key:
+            if self.left:
+                return self.left.upperbond(key)
+            else:
+                return self
+        else:
+            if self.right:
+                return self.right.upperbond(key)
+            else:
+                return self.next_node()
+
+    def lowerbond(self, key: int) -> Optional['Node']:
+        if key == self.key:
+            return self
+        if key < self.key:
+            if self.left:
+                return self.left.lowerbond(key)
+            else:
+                return self.prev_node()
+        else:
+            if self.right:
+                return self.right.lowerbond(key)
+            else:
+                return self
+
     def update_heights(self):
         node = self
         while node:
@@ -308,6 +360,12 @@ class Tree:
             return
         self.root = self.root.delete(node)
 
+    def upperbond(self, key) -> Optional['Node']:
+        return self.root.upperbond(key) if self.root else None
+
+    def lowerbond(self, key) -> Optional['Node']:
+        return self.root.lowerbond(key) if self.root else None
+
     def min(self) -> Optional[int]:
         if not self.root:
             return None
@@ -332,17 +390,29 @@ def f(x: int, s: int) -> int:
 def main():
     s = 0
     tree = Tree()
-    cmd = input().split()
-    if cmd[0] == '?':
-        print(tree.find(f(int(cmd[1]), s)))
-    elif cmd[0] == '+':
-        tree.insert(int(f(int(cmd[1]), s)))
-    elif cmd[0] == '-':
-        tree.delete(int(f(int(cmd[1]), s)))
-    elif cmd[0] == 's':
-        l = f(int(cmd[1]), s)
-        r = f(int(cmd[2]), s)
-        print()
+    n = int(input())
+    for _ in range(n):
+        cmd = input().split()
+        if cmd[0] == '?':
+            print('Found' if tree.find(f(int(cmd[1]), s)) else 'Not found')
+        elif cmd[0] == '+':
+            tree.insert(int(f(int(cmd[1]), s)))
+        elif cmd[0] == '-':
+            tree.delete(int(f(int(cmd[1]), s)))
+        elif cmd[0] == 's':
+            l = f(int(cmd[1]), s)
+            r = f(int(cmd[2]), s)
+            if l > r:
+                s = 0
+            else:
+                node = tree.upperbond(l)
+                last_node = tree.lowerbond(r)
+                s = 0
+                if node and last_node:
+                    while node and node.key <= last_node.key:
+                        s += node.key
+                        node = node.next_node()
+            print(s)
 
 
 if __name__ == '__main__':
