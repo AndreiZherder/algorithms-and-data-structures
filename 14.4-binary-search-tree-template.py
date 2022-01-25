@@ -10,6 +10,7 @@ class Node:
         self.left: Optional['Node'] = None
         self.right: Optional['Node'] = None
         self.height = 0
+        self.sum = key
 
     def __str__(self):
         lines, *_ = self.__display_aux()
@@ -19,7 +20,7 @@ class Node:
         """Returns list of strings, width, height, and horizontal coordinate of the root."""
         # No child.
         if not self.right and not self.left:
-            line = f"{self.key}({self.height})"
+            line = f"{self.key}({self.height})({self.sum})"
             width = len(line)
             height = 1
             middle = width // 2
@@ -28,7 +29,7 @@ class Node:
         # Only left child.
         if not self.right:
             lines, n, p, x = self.left.__display_aux()
-            s = f"{self.key}({self.height})"
+            s = f"{self.key}({self.height})({self.sum})"
             u = len(s)
             first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s
             second_line = x * ' ' + '/' + (n - x - 1 + u) * ' '
@@ -38,7 +39,7 @@ class Node:
         # Only right child.
         if not self.left:
             lines, n, p, x = self.right.__display_aux()
-            s = f"{self.key}({self.height})"
+            s = f"{self.key}({self.height})({self.sum})"
             u = len(s)
             first_line = s + x * '_' + (n - x) * ' '
             second_line = (u + x) * ' ' + '\\' + (n - x - 1) * ' '
@@ -48,7 +49,7 @@ class Node:
         # Two children.
         left, n, p, x = self.left.__display_aux()
         right, m, q, y = self.right.__display_aux()
-        s = f"{self.key}({self.height})"
+        s = f"{self.key}({self.height})({self.sum})"
         u = len(s)
         first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s + y * '_' + (m - y) * ' '
         second_line = x * ' ' + '/' + (n - x - 1 + u + y) * ' ' + '\\' + (m - y - 1) * ' '
@@ -199,6 +200,9 @@ class Node:
             left_height = node.left.height if node.left else 0
             right_height = node.right.height if node.right else 0
             node.height = (1 + max(left_height, right_height)) if (node.left or node.right) else 0
+            left_sum = node.left.sum if node.left else 0
+            right_sum = node.right.sum if node.right else 0
+            node.sum = node.key + left_sum + right_sum
             node = node.parent
 
     def balance_factor(self, node: 'Node') -> int:
@@ -276,6 +280,23 @@ class Tree:
     def lowerbond(self, key):
         return self.root.lowerbond(key) if self.root else None
 
+    def sum_between(self, l: 'Node', r: 'Node'):
+        left_key = l.key
+        right_key = r.key
+        left_sum = l.left.sum if l.left else 0
+        right_sum = r.right.sum if r.right else 0
+        while l.key != r.key:
+            if l.height <= r.height:
+                l = l.parent
+                if l.key < left_key:
+                    left_sum += l.key + (l.left.sum if l.left else 0)
+            else:
+                r = r.parent
+                if r.key > right_key:
+                    right_sum += r.key + (r.right.sum if r.right else 0)
+
+        return l.sum - left_sum - right_sum
+
     def min(self) -> Optional[int]:
         if not self.root:
             return None
@@ -295,13 +316,14 @@ class Tree:
 
 def main():
     tree = Tree()
-    for key in range(0, 66, 2):
+    for key in range(0, 130, 2):
         tree.insert(key)
     print(tree)
-    l = tree.upperbond(10)
-    r = tree.lowerbond(20)
+    l = tree.upperbond(8)
+    r = tree.lowerbond(14)
     print(l.key)
     print(r.key)
+    print(tree.sum_between(l, r))
 
 
 if __name__ == '__main__':
