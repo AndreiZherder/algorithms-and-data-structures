@@ -274,10 +274,10 @@ class Tree:
             return
         self.root = self.root.delete(node)
 
-    def upperbond(self, key):
+    def upperbond(self, key) -> Optional['Node']:
         return self.root.upperbond(key) if self.root else None
 
-    def lowerbond(self, key):
+    def lowerbond(self, key) -> Optional['Node']:
         return self.root.lowerbond(key) if self.root else None
 
     def sum_between(self, l: 'Node', r: 'Node'):
