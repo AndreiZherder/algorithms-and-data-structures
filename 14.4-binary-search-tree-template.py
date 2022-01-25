@@ -166,31 +166,31 @@ class Node:
                 node = node.parent
             return node.parent
 
-    def upperbond(self, key: int) -> Optional['Node']:
+    def upperbound(self, key: int) -> Optional['Node']:
         if key == self.key:
             return self
         if key < self.key:
             if self.left:
-                return self.left.upperbond(key)
+                return self.left.upperbound(key)
             else:
                 return self
         else:
             if self.right:
-                return self.right.upperbond(key)
+                return self.right.upperbound(key)
             else:
                 return self.next_node()
 
-    def lowerbond(self, key: int) -> Optional['Node']:
+    def lowerbound(self, key: int) -> Optional['Node']:
         if key == self.key:
             return self
         if key < self.key:
             if self.left:
-                return self.left.lowerbond(key)
+                return self.left.lowerbound(key)
             else:
                 return self.prev_node()
         else:
             if self.right:
-                return self.right.lowerbond(key)
+                return self.right.lowerbound(key)
             else:
                 return self
 
@@ -274,11 +274,11 @@ class Tree:
             return
         self.root = self.root.delete(node)
 
-    def upperbond(self, key) -> Optional['Node']:
-        return self.root.upperbond(key) if self.root else None
+    def upperbound(self, key) -> Optional['Node']:
+        return self.root.upperbound(key) if self.root else None
 
-    def lowerbond(self, key) -> Optional['Node']:
-        return self.root.lowerbond(key) if self.root else None
+    def lowerbound(self, key) -> Optional['Node']:
+        return self.root.lowerbound(key) if self.root else None
 
     def sum_between(self, l: 'Node', r: 'Node'):
         left_key = l.key
@@ -319,8 +319,8 @@ def main():
     for key in range(0, 130, 2):
         tree.insert(key)
     print(tree)
-    l = tree.upperbond(8)
-    r = tree.lowerbond(14)
+    l = tree.upperbound(8)
+    r = tree.lowerbound(14)
     print(l.key)
     print(r.key)
     print(tree.sum_between(l, r))
