@@ -73,50 +73,38 @@ class Tree:
         self.nodes = nodes
 
     def preorder(self, i: int):
-        stack = [i]
-        yield self.nodes[i].key
-        i = self.nodes[i].left
-        while stack:
-            while i != -1:
-                stack.append(i)
-                yield self.nodes[i].key
-                i = self.nodes[i].left
-            i = stack.pop()
-            i = self.nodes[i].right
+        stack = []
+        while stack or i != -1:
             if i != -1:
-                stack.append(i)
                 yield self.nodes[i].key
+                stack.append(i)
                 i = self.nodes[i].left
+            else:
+                i = stack.pop()
+                i = self.nodes[i].right
 
     def inorder(self, i: int):
-        stack = [i]
-        i = self.nodes[i].left
-        while stack:
-            while i != -1:
-                stack.append(i)
-                i = self.nodes[i].left
-            i = stack.pop()
-            yield self.nodes[i].key
-            i = self.nodes[i].right
+        stack = []
+        while stack or i != -1:
             if i != -1:
                 stack.append(i)
                 i = self.nodes[i].left
+            else:
+                i = stack.pop()
+                yield self.nodes[i].key
+                i = self.nodes[i].right
 
     def postorder(self, i: int):
-        stack = [i]
-        ans = [self.nodes[i].key]
-        i = self.nodes[i].right
-        while stack:
-            while i != -1:
-                stack.append(i)
-                ans.append(self.nodes[i].key)
-                i = self.nodes[i].right
-            i = stack.pop()
-            i = self.nodes[i].left
+        stack = []
+        ans = []
+        while stack or i != -1:
             if i != -1:
-                stack.append(i)
                 ans.append(self.nodes[i].key)
+                stack.append(i)
                 i = self.nodes[i].right
+            else:
+                i = stack.pop()
+                i = self.nodes[i].left
         yield from reversed(ans)
 
 
