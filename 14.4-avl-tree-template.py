@@ -262,22 +262,23 @@ class Tree:
     def find(self, key: int) -> Optional['Node']:
         return self.root.find(key) if self.root else None
 
-    def insert(self, key):
+    def insert(self, key: int):
         if self.root:
             self.root = self.root.insert(key)
         else:
             self.root = Node(key)
 
-    def delete(self, key):
-        node = self.root.find(key) if self.root else None
+    def delete(self, key: int, node: 'Node' = None):
+        if not node:
+            node = self.root.find(key) if self.root else None
         if not node:
             return
         self.root = self.root.delete(node)
 
-    def upperbound(self, key) -> Optional['Node']:
+    def upperbound(self, key: int) -> Optional['Node']:
         return self.root.upperbound(key) if self.root else None
 
-    def lowerbound(self, key) -> Optional['Node']:
+    def lowerbound(self, key: int) -> Optional['Node']:
         return self.root.lowerbound(key) if self.root else None
 
     def sum_between(self, l: 'Node', r: 'Node'):
@@ -297,21 +298,21 @@ class Tree:
 
         return l.sum - left_sum - right_sum
 
-    def min(self) -> Optional[int]:
+    def min(self) -> Optional['Node']:
         if not self.root:
             return None
         node = self.root
         while node.left:
             node = node.left
-        return node.key
+        return node
 
-    def max(self) -> Optional[int]:
+    def max(self) -> Optional['Node']:
         if not self.root:
             return None
         node = self.root
         while node.right:
             node = node.right
-        return node.key
+        return node
 
 
 def main():
