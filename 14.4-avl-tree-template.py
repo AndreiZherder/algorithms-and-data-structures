@@ -430,16 +430,16 @@ class Tree:
 
 
 def main():
-    tree = Tree()
-    for key in range(0, 4):
-        tree.insert(key)
-    print(tree)
-    for i in range(0, 4):
-        tree1, tree2 = tree.split(tree, i)
-        print('tree1\n', tree1)
-        print('tree2\n', tree2)
+    tree1 = Tree()
+    for key in range(0, 16):
+        tree1.insert(key)
+    print(tree1)
+    for i in range(0, 16):
+        tree1, tree2 = tree1.split(tree1, i)
+        # print('tree1\n', tree1)
+        # print('tree2\n', tree2)
         tree1.merge(tree2)
-        print('merge\n', tree1)
+        # print('merge\n', tree1)
 
 
 if __name__ == '__main__':
