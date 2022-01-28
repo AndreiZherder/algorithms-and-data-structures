@@ -17,6 +17,16 @@ class Node:
         lines, *_ = self.__display_aux()
         return '\n'.join(lines)
 
+    def __getitem__(self, i) -> Optional['Node']:
+        node = self
+        pos = node.size - (node.right.size if node.right else 0) - 1
+        if i == pos:
+            return node.key
+        elif i < pos:
+            return node.left[i] if node.left else None
+        else:
+            return node.right[i - (node.left.size + 1 if node.left else 1)] if node.right else None
+
     def __display_aux(self):
         """Returns list of strings, width, height, and horizontal coordinate of the root."""
         # No child.
@@ -272,6 +282,18 @@ class Tree:
     def __str__(self):
         return self.root.__str__() if self.root else 'None'
 
+    def __getitem__(self, i) -> Optional['Node']:
+        if not self.root:
+            return None
+        node = self.root
+        pos = node.size - (node.right.size if node.right else 0) - 1
+        if i == pos:
+            return node.key
+        elif i < pos:
+            return node.left[i] if node.left else None
+        else:
+            return node.right[i - (node.left.size + 1 if node.left else 1)] if node.right else None
+
     def find(self, key: int) -> Optional['Node']:
         return self.root.find(key) if self.root else None
 
@@ -433,13 +455,12 @@ def main():
     tree1 = Tree()
     for key in range(0, 16):
         tree1.insert(key)
-    print(tree1)
     for i in range(0, 16):
         tree1, tree2 = tree1.split(tree1, i)
-        # print('tree1\n', tree1)
-        # print('tree2\n', tree2)
         tree1.merge(tree2)
-        # print('merge\n', tree1)
+    print(tree1)
+    for i in range(-1, 17):
+        print(tree1[i])
 
 
 if __name__ == '__main__':
