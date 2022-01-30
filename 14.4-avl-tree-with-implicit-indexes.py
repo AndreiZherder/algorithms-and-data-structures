@@ -288,6 +288,21 @@ class Tree:
                 yield node.key
                 node = node.right
 
+    def insert(self, key: str):
+        if not self.root:
+            self.root = Node(key)
+            self.root.parent = None
+            return
+        node = self.max()
+        node.right = Node(key, node)
+        node.update_heights()
+        ret = node
+        while node:
+            node = node.balance(node)
+            ret = node
+            node = node.parent
+        self.root = ret
+
     def delete(self, i: int, node: 'Node' = None):
         if not node:
             node = self[i] if self.root else None
