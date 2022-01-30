@@ -184,12 +184,19 @@ class Node:
     def update_heights(self):
         node = self
         while node:
-            left_height = node.left.height if node.left else 0
-            right_height = node.right.height if node.right else 0
-            node.height = (1 + max(left_height, right_height)) if (node.left or node.right) else 0
-            left_size = node.left.size if node.left else 0
-            right_size = node.right.size if node.right else 0
-            node.size = 1 + left_size + right_size
+            if node.left:
+                if node.right:
+                    node.height = 1 + max(node.left.height, node.right.height)
+                    node.size = 1 + node.left.size + node.right.size
+                else:
+                    node.height = 1 + node.left.height
+                    node.size = 1 + node.left.size
+            elif node.right:
+                node.height = 1 + node.right.height
+                node.size = 1 + node.right.size
+            else:
+                node.height = 0
+                node.size = 1
             node = node.parent
 
     def balance_factor(self, node: 'Node') -> int:
