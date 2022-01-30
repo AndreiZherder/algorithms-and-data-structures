@@ -34,9 +34,7 @@ abcdef
 efcabd
 abcdef - cabdef - efcabd
 """
-import random
-import time
-from collections import namedtuple
+from collections import namedtuple, deque
 from typing import Optional
 
 
@@ -362,6 +360,31 @@ class Tree:
     def split(self, tree: 'Tree', i: int) -> ('Tree', 'Tree'):
         if not tree.root:
             return tree, Tree()
+
+        if i < 0:
+            return Tree(), tree
+        if i == 0:
+            node = tree.min()
+            if node == tree.root:
+                tree2 = Tree()
+                tree2.root = node.right
+                if tree2.root:
+                    tree2.root.parent = None
+                node.right = None
+                node.update_heights()
+                return tree, tree2
+            else:
+                tree1 = Tree()
+                tree1.root = node
+                node.parent.left = node.right
+                if node.right:
+                    node.right.parent = node.parent
+                node.parent.update_heights()
+                node.right = None
+                node.parent = None
+                node.update_heights()
+                return tree1, tree
+
         pos = tree.root.size - (tree.root.right.size if tree.root.right else 0) - 1
         if i < pos:
             tree1 = Tree()
@@ -430,36 +453,33 @@ class Tree:
 
 
 def main():
-    # s = input()
-    lst = []
-    l = 300000
-    for i in range(l):
-        lst.append(random.choice('abcdefghijklmnopqrstuvwxyz'))
-    s = ''.join(lst)
-    tree = Tree(Node(s[0]))
-    t1 = time.perf_counter_ns()
-    for c in s:
-        tree1 = Tree(Node(c))
-        tree.merge(tree1)
-    t2 = time.perf_counter_ns()
-    print('make tree, ns:', t2 - t1)
+    s = input()
+    trees = deque(Tree(Node(c)) for c in s)
+    while len(trees) > 1:
+        if len(trees) % 2 == 1:
+            tree2 = trees.pop()
+            tree1 = trees.pop()
+            tree1.merge(tree2)
+            trees.append(tree1)
+        for i in range(len(trees) // 2):
+            tree1 = trees.popleft()
+            tree2 = trees.popleft()
+            tree1.merge(tree2)
+            trees.append(tree1)
+    tree = trees.pop()
 
-    # n = int(input())
-    n = 100000
+    n = int(input())
     Command = namedtuple('Command', 'i j k')
-    # commands = (Command(*map(int, input().split())) for _ in range(n))
-    commands = (Command(0, 0, 1) for _ in range(n))
-    t1 = time.perf_counter_ns()
+    commands = (Command(*map(int, input().split())) for _ in range(n))
     for command in commands:
         tree, tree3 = tree.split(tree, command.i - 1)
         part, tree3 = tree3.split(tree3, command.j - command.i)
         tree.merge(tree3)
         tree, tree3 = tree.split(tree, command.k - 1)
+        part.merge(tree3)
         tree.merge(part)
-        tree.merge(tree3)
-    t2 = time.perf_counter_ns()
-    print('commands , ns:', t2 - t1)
-    # print(''.join(tree.inorder()))
+
+    print(''.join(tree.inorder()))
 
 
 if __name__ == '__main__':
