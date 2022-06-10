@@ -12,33 +12,34 @@ n целых чисел от 1 до 10^9 — сам массив.
 Если таких i,j,k не существует, выведите единственное число − 1. Иначе выведите на одной строке три числа — i,j,k.
 Элементы массивов нумеруются с нуля. Если ответов несколько, выведите лексикографически минимальный.
 """
-import random
-from typing import List
+from typing import List, Tuple
 
 
-def solution(s: int, a: List[int], b: List[int], c: List[int]) -> List[int]:
-    d = {}
-    for i, num in enumerate(c):
-        if s - num not in d:
-            d[s - num] = i
-    for i, num1 in enumerate(a):
-        for j, num2 in enumerate(b):
-            if num1 + num2 in d:
-                return [i, j, d[num1 + num2]]
-    return [-1, -1, -1]
+def solution(s: int, a: List[Tuple[int, int]],
+             b: List[Tuple[int, int]],
+             c: List[Tuple[int, int]]) -> Tuple[int, int, int]:
+    a.sort()
+    b.sort()
+    c.sort(key=lambda item: (item[0], -item[1]))
+    ans = (15000, 15000, 15000)
+    for num1, i in a:
+        pos = len(c) - 1
+        for num2, j in b:
+            while pos >= 0 and c[pos][0] > s - (num1 + num2):
+                pos -= 1
+            if pos >= 0 and c[pos][0] == s - (num1 + num2):
+                ans = min(ans, (i, j, c[pos][1]))
+
+    return ans
 
 
 def main():
-    # s = int(input())
-    # _, *a = (int(num) for num in input().split())
-    # _, *b = (int(num) for num in input().split())
-    # _, *c = (int(num) for num in input().split())
-    a = [random.randrange(10000) for i in range(15000)]
-    b = [random.randrange(10000) for i in range(15000)]
-    c = [random.randrange(10000) for i in range(15000)]
-    s = 30000
+    s = int(input())
+    _, *a = ((int(num), i - 1) for i, num in enumerate(input().split()))
+    _, *b = ((int(num), i - 1) for i, num in enumerate(input().split()))
+    _, *c = ((int(num), i - 1) for i, num in enumerate(input().split()))
     ans = solution(s, a, b, c)
-    if ans[0] == -1:
+    if ans[0] == 15000:
         print(-1)
     else:
         print(*ans)
