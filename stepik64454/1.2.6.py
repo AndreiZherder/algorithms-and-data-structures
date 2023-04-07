@@ -1,5 +1,4 @@
 import sys
-from bisect import bisect_right
 from itertools import permutations
 
 
@@ -17,13 +16,13 @@ def solution():
     if int(s) >= 98765431:
         print(-1)
         return
-    s = list(s)
+    s = tuple(s)
     digits = '13456789'
-    perms = list(permutations(digits, len(s)))
-    i = bisect_right(perms, tuple(s))
-    if i < len(perms):
-        print(''.join(perms[i]))
-        return
+
+    for perm in permutations(digits, len(s)):
+        if perm > s:
+            print(''.join(perm))
+            return
     print(''.join(next(permutations(digits, len(s) + 1))))
 
 
