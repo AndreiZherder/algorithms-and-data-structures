@@ -13,28 +13,22 @@ def print(*args, sep=' ', end='\n'):
 def solution():
     mod = 10 ** 9 + 33
     n, m = (int(num) for num in input().split())
-    pref_row = [[0 for j in range(m + 1)] for i in range(n + 1)]
     pref_col = [[0 for j in range(m + 1)] for i in range(n + 1)]
-    pref_row[1][1] = 1
     pref_col[1][1] = 1
     cur = 1
 
-    for i in range(2, n + 1):
-        j = 1
-        cur = (pref_row[i][j - 1] + pref_col[i - 1][j]) % mod
-        pref_row[i][j] = (pref_row[i][j - 1] + cur) % mod
-        pref_col[i][j] = (pref_col[i - 1][j] + cur) % mod
-
+    pref_row = 1
     for j in range(2, m + 1):
         i = 1
-        cur = (pref_row[i][j - 1] + pref_col[i - 1][j]) % mod
-        pref_row[i][j] = (pref_row[i][j - 1] + cur) % mod
+        cur = (pref_row + pref_col[i - 1][j]) % mod
+        pref_row = (pref_row + cur) % mod
         pref_col[i][j] = (pref_col[i - 1][j] + cur) % mod
 
     for i in range(2, n + 1):
-        for j in range(2, m + 1):
-            cur = (pref_row[i][j - 1] + pref_col[i - 1][j]) % mod
-            pref_row[i][j] = (pref_row[i][j - 1] + cur) % mod
+        pref_row = 0
+        for j in range(1, m + 1):
+            cur = (pref_row + pref_col[i - 1][j]) % mod
+            pref_row = (pref_row + cur) % mod
             pref_col[i][j] = (pref_col[i - 1][j] + cur) % mod
 
     print(cur)
